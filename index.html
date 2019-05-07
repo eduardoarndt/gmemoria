@@ -46,13 +46,20 @@
 
         //criar processo de exemplo
         var processoExemplo = new Process(
-            pId = "Teste",
-            pNome = "Teste",
+            pId = "Teste", //gerar de id
+            pNome = "Teste", //gerador de string
             pPosInicial = "Teste",
             pPosFinal = "Teste",
-            pTamanho = "Teste",
-            pCiclos = "Teste"
+            pTamanho = "Teste", //gerador de int
+            pCiclos = "Teste" //gerador de int
         );
+
+        var tamanhoMemoria = 5000;
+        var memoria = [];
+        
+        for (let i = 0; i < tamanhoMemoria; i++) {
+            memoria.push(".");
+        }
     </script>
 </body>
 
