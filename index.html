@@ -33,17 +33,25 @@
     <script>
         //classe processo
         class processo {
-            constructor(pId, pNome, pTamanho, pCiclos) {
+            constructor(pId, pNome, pPosInicial, pPosFinal, pTamanho, pCiclos) {
                 this.id = pId;
                 this.nome = pNome;
+                this.posInicial = pPosInicial;
+                this.posFinal = pPosFInal;
                 this.tamanho = pTamanho;
                 this.ciclos = pCiclos;
                 this.ciclosFixo = pCiclos;
             }
         }
 
+        //criar processo de exemplo
         var processoExemplo = new Process(
-            //parametros
+            pId = "Teste",
+            pNome = "Teste",
+            pPosInicial = "Teste",
+            pPosFinal = "Teste",
+            pTamanho = "Teste",
+            pCiclos = "Teste"
         );
     </script>
 </body>
