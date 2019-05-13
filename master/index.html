@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+
+    <!-- Font -->
+    <link href="https://fonts.googleapis.com/css?family=Overpass+Mono" rel="stylesheet">
+
+    <style>
+        * {
+            font-family: 'Overpass Mono', monospace;
+        }
+
+        .full {
+            width: 100vw;
+            height: 100vh;
+            margin: 0;
+            padding: 0;
+            /* overflow: hidden;
+            overflow-x: hidden; */
+        }
+    </style>
+
+    <title>Gerenciamento de Memória</title>
+</head>
+
+<body>
+    <div class="full">
+        <div>
+            <h1>Gerenciamento de Memória</h1>
+            <p>A script on this page starts this clock:</p>
+            <p id="demo">X</p>
+            <button onclick="start()">Iniciar</button>
+            <button onclick="stop()">Parar</button>
+        </div>
+
+        <div id="memoria">
+
+        </div>
+    </div>
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+    <script>
+        //Definição de Classes
+        class Processo {
+            constructor(pId, pNome, pPosInicial, pPosFinal, pTamanho, pCiclos) {
+                this.id = pId;
+                this.nome = pNome;
+                this.posInicial = pPosInicial;
+                this.posFinal = pPosFinal;
+                this.tamanho = pTamanho;
+                this.ciclos = pCiclos;
+                this.ciclosFixo = pCiclos;
+            }
+        }
+
+        //Definição de Variavéis Principais/Globais
+        var programa = 1; //armazena função main temporizada;
+        var count = 0;
+        var memoriaDOM = document.getElementById("memoria");
+
+        //Definição de Funções
+        function start() {
+            //setInterval(função a ser executada, tempo de dada ciclo);
+            programa = setInterval(main, 1000);
+            console.log('start');
+        }
+
+        function stop() {
+            clearInterval(programa);
+            console.log('stop');
+        }
+
+        function atualizar() {
+            //TODO: fazer grid 50x100
+            memoria.forEach(element => {
+                if (element) {
+                    var node = document.createElement("LI");
+                    var text = document.createTextNode(element['id']);
+                    node.appendChild(text);
+                    memoriaDOM.appendChild(node);
+                } else {
+                    var node = document.createElement("LI");
+                    var text = document.createTextNode(".");
+                    node.appendChild(text);
+                    memoriaDOM.appendChild(node);
+                }
+            });
+        }
+
+        function memoriaLivre() {
+
+        }
+
+        //Inicio programa
+        function main() {
+            var d = count++;
+            document.getElementById("memoria").innerHTML = d;
+            console.log('main');
+            atualizar();
+        }
+
+        //Trabalho anterior
+        //https://gitlab.com/earndt/multiprog-simulation/blob/master/index.html
+
+        //criar processo de exemplo
+        var processoExemplo = new Processo(
+            pId = "Teste", //gerar de id
+            pNome = "Teste", //gerador de string
+            pPosInicial = "Teste",
+            pPosFinal = "Teste",
+            pTamanho = "Teste", //gerador de int
+            pCiclos = "Teste" //gerador de int
+        );
+
+        var tamanhoMemoria = 5000;
+        var memoria = [];
+
+        for (let i = 0; i < tamanhoMemoria; i++) {
+            memoria.push(null);
+            //memoria.push(processoExemplo);
+        }
+
+    </script>
+</body>
+
+</html>
