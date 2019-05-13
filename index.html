@@ -10,11 +10,20 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
 
     <!-- Font -->
-    <link href="https://fonts.googleapis.com/css?family=Oxygen+Mono" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Overpass+Mono" rel="stylesheet">
 
     <style>
         * {
-            font-family: 'Oxygen Mono', monospace;
+            font-family: 'Overpass Mono', monospace;
+        }
+
+        .full {
+            width: 100vw;
+            height: 100vh;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            overflow-x: hidden;
         }
     </style>
 
@@ -22,7 +31,15 @@
 </head>
 
 <body>
-    <h1>Gerenciamento de Memória</h1>
+    <div class="full">
+        <div>
+            <h1>Gerenciamento de Memória</h1>
+            <p>A script on this page starts this clock:</p>
+            <p id="demo">X</p>
+            <button onclick="start()">Iniciar</button>
+            <button onclick="stop()">Parar</button>
+        </div>
+    </div>
 
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
@@ -31,21 +48,53 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
 
     <script>
+        //Definição de Classes
         //classe processo
-        class processo {
+        class Processo {
             constructor(pId, pNome, pPosInicial, pPosFinal, pTamanho, pCiclos) {
                 this.id = pId;
                 this.nome = pNome;
                 this.posInicial = pPosInicial;
-                this.posFinal = pPosFInal;
+                this.posFinal = pPosFinal;
                 this.tamanho = pTamanho;
                 this.ciclos = pCiclos;
                 this.ciclosFixo = pCiclos;
             }
         }
 
+        //Definição de Variavéis Principais/Globais
+
+        var programa = 1; //armazena função main temporizada;
+        var count = 0;
+
+        //Definição de Funções
+        function start() {
+            //setInterval(função a ser executada, tempo de dada ciclo);
+            programa = setInterval(main, 1000);
+            console.log('start');
+        }
+
+        function stop() {
+            clearInterval(programa);
+            console.log('stop');
+        }
+
+        function memoriaLivre() {
+
+        }
+
+        //Inicio programa
+        function main() {
+            var d = count++;
+            document.getElementById("demo").innerHTML = d;
+            console.log('main');
+        }
+
+        //Trabalho anterior
+        //https://gitlab.com/earndt/multiprog-simulation/blob/master/index.html
+
         //criar processo de exemplo
-        var processoExemplo = new Process(
+        var processoExemplo = new Processo(
             pId = "Teste", //gerar de id
             pNome = "Teste", //gerador de string
             pPosInicial = "Teste",
@@ -56,10 +105,11 @@
 
         var tamanhoMemoria = 5000;
         var memoria = [];
-        
+
         for (let i = 0; i < tamanhoMemoria; i++) {
             memoria.push(".");
         }
+
     </script>
 </body>
 
