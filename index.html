@@ -22,8 +22,8 @@
             height: 100vh;
             margin: 0;
             padding: 0;
-            overflow: hidden;
-            overflow-x: hidden;
+            /* overflow: hidden;
+            overflow-x: hidden; */
         }
     </style>
 
@@ -38,6 +38,10 @@
             <p id="demo">X</p>
             <button onclick="start()">Iniciar</button>
             <button onclick="stop()">Parar</button>
+        </div>
+
+        <div id="memoria">
+
         </div>
     </div>
 
@@ -64,6 +68,7 @@
         //Definição de Variavéis Principais/Globais
         var programa = 1; //armazena função main temporizada;
         var count = 0;
+        var memoriaDOM = document.getElementById("memoria");
 
         //Definição de Funções
         function start() {
@@ -77,6 +82,23 @@
             console.log('stop');
         }
 
+        function atualizar() {
+            //TODO: fazer grid 50x100
+            memoria.forEach(element => {
+                if (element) {
+                    var node = document.createElement("LI");
+                    var text = document.createTextNode(element['id']);
+                    node.appendChild(text);
+                    memoriaDOM.appendChild(node);
+                } else {
+                    var node = document.createElement("LI");
+                    var text = document.createTextNode(".");
+                    node.appendChild(text);
+                    memoriaDOM.appendChild(node);
+                }
+            });
+        }
+
         function memoriaLivre() {
 
         }
@@ -84,8 +106,9 @@
         //Inicio programa
         function main() {
             var d = count++;
-            document.getElementById("demo").innerHTML = d;
+            document.getElementById("memoria").innerHTML = d;
             console.log('main');
+            atualizar();
         }
 
         //Trabalho anterior
@@ -105,7 +128,8 @@
         var memoria = [];
 
         for (let i = 0; i < tamanhoMemoria; i++) {
-            memoria.push(".");
+            memoria.push(null);
+            //memoria.push(processoExemplo);
         }
 
     </script>
