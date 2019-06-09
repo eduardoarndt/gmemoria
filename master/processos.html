@@ -1,0 +1,344 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <!-- Font -->
+    <link href="https://fonts.googleapis.com/css?family=Oxygen+Mono" rel="stylesheet">
+
+    <style>
+        * {
+            font-family: 'Oxygen Mono', monospace;
+        }
+
+        #full {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            overflow-x: hidden;
+        }
+
+        #big-box {
+            background: linear-gradient(60deg, yellow, hotpink);
+            background-size: 300% 300%;
+            -webkit-animation: gradientAnimation 5s ease infinite;
+            -moz-animation: gradientAnimation 5s ease infinite;
+            animation: gradientAnimation 5s ease infinite;
+        }
+
+        .text-top {
+            text-align: center;
+        }
+
+        .txt-header {
+            text-align: center;
+            flex: 1;
+        }
+
+        .txt-title {
+            font-style: normal;
+            font-weight: 600;
+            margin: 10px;
+        }
+
+        .txt-lista {
+            text-align: left;
+            font-size: 12px;
+            line-height: 1.1;
+        }
+
+        .full-height-screen {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        .full-height {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        .list-block {
+            display: block;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .columns {
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            padding: 20px;
+        }
+
+        .rows {
+            display: flex;
+            flex-direction: row;
+            justify-content: flex-start;
+            padding: 5px;
+        }
+
+        @-webkit-keyframes gradientAnimation {
+            0% {
+                background-position: 1% 0%
+            }
+
+            50% {
+                background-position: 99% 100%
+            }
+
+            100% {
+                background-position: 1% 0%
+            }
+        }
+
+        @-moz-keyframes gradientAnimation {
+            0% {
+                background-position: 1% 0%
+            }
+
+            50% {
+                background-position: 99% 100%
+            }
+
+            100% {
+                background-position: 1% 0%
+            }
+        }
+
+        @keyframes gradientAnimation {
+            0% {
+                background-position: 1% 0%
+            }
+
+            50% {
+                background-position: 99% 100%
+            }
+
+            100% {
+                background-position: 1% 0%
+            }
+        }
+    </style>
+
+    <title>Multiprogramação - Eduardo Arndt</title>
+</head>
+
+<body>
+    <!-- Button trigger modal -->
+    <button id="btnModal" type="button" class="btn btn-primary hidden" data-toggle="modal" data-target="#exampleModal">
+        Launch demo modal
+    </button>
+
+    <!-- Modal -->
+    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Definições</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div>
+                        <label for="algoritmo">Algoritmo de escalonamento</label>
+                        <br>
+                        <select name="algoritmo" id="algoritmo" style="width: 100%; padding: 5px;">
+                            <option value="1">First-Fit</option>
+                            <option value="2">Circular-Fit</option>
+                            <option value="3">Best-Fit</option>
+                            <option value="4">Worst-Fit</option>
+                        </select>
+                    </div>
+                    <br>
+                    <div>
+                        <label for="">Quantidade máxima de processos</label>
+                        <br>
+                        <input id="qtProcessos" type="number" style="width: 100%; padding: 5px;">
+                    </div>
+                    <br>
+                    <div>
+                        <label for="">Tempo de espera (ms)</label>
+                        <br>
+                        <input id="tempoEspera" type="number" style="width: 100%; padding: 5px;">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" onclick="validarDados();">Salvar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+    <script>
+
+        $(document).ready(function () {
+            $('#btnModal').click();
+        });
+
+        function validarDados() {
+            algoritmo = document.getElementById("algoritmo").value;
+            qtProcessos = document.getElementById("qtProcessos").value;
+            tempoEspera = document.getElementById("tempoEspera").value;
+
+            if (qtProcessos > 200) {
+                alert('A quantidade máxima de processos não pode ser superior a 200!');
+                return;
+            } else {
+                $('#exampleModal').modal('hide');
+                program(qtProcessos, tempoEspera);
+            }
+        }
+
+        function program(qtProcessosParam, tempoEsperaParam, qualAlgoritmo) {
+
+            class Process {
+                constructor(processId, processName, processCycles, processSize) {
+                    this.id = processId;
+                    this.nome = processName;
+                    this.qtCiclos = processCycles;
+                    this.qtCiclosFixa = processCycles;
+                    this.tamanho = processSize;
+                }
+            }
+
+            /* 
+            1 first-fit;
+            2 circular-fit;
+            3 best-fit;
+            4 worst-fit;
+            */
+
+            algoritmo = qualAlgoritmo; 
+            qtProcessos = qtProcessosParam;
+            tempoEspera = tempoEsperaParam;
+
+            //controla execução do programa
+            var executar = true;
+
+            //gerador de ids para processos... só usar $idProcesso++;
+            var idProcesso = 0;
+
+            //ciclos que se passaram;
+            var ciclos = 0;
+
+            //arrays de estados
+            var creation = new Array();   //criado
+            var running = new Array();    //rodando, está na memória
+            var done = new Array();       //já foi executado e finalizou
+
+            //todos processos
+            var todosProcessos = new Array();
+
+            //memoria
+            var memoria = new Array();
+
+            //DOM
+            //declarar variaveis DOM
+
+            function atualizar() {
+                //atualizar DOM
+            }
+
+            function getRandomInt(min, max) {
+                min = Math.ceil(min);
+                max = Math.floor(max);
+                return Math.floor(Math.random() * (max - min + 1)) + min;
+            }
+            
+            function main() {
+                setTimeout(function () {
+                    if (todosProcessos.length == 0) {
+                        //criar primeiro processo
+                        let dumpCiclos = getRandomInt(1, 300);
+                        let dumpTamanho = getRandomInt(100, 1000);
+
+                        todosProcessos.push(new Process(
+                            idProcesso++,                                       //id
+                            "P" + Math.random().toString(36).substr(2, 5),      //nome
+                            dumpCiclos,                                         //qt ciclos
+                            dumpTamanho                                         //tamanho
+                        ));
+
+                        //mover ultimo do todosProcessos para creation
+                        ultimoCriado = todosProcessos[todosProcessos.length - 1];
+                        creation.push(ultimoCriado);
+
+                    } else if (todosProcessos.length < qtProcessos) {
+                        //20% de chance de criar
+                        criarNovo = getRandomInt(0, 100);
+                        if ((criarNovo >= 0) && (criarNovo <= 20)) {
+                            let dumpCiclos = getRandomInt(1, 300);
+                            let dumpTamanho = getRandomInt(100, 1000);
+
+                            todosProcessos.push(new Process(
+                                idProcesso++,                                       //id
+                                "P" + Math.random().toString(36).substr(2, 5),      //nome
+                                dumpCiclos,                                         //qt ciclos
+                                dumpTamanho                                         //tamanho
+                            ));
+
+                            //mover ultimo do todosProcessos para creation
+                            ultimoCriado = todosProcessos[todosProcessos.length - 1];
+                            creation.push(ultimoCriado);
+                        }
+                    }
+
+                    switch (algoritmo) {
+                        case 1:
+                            //first-fit
+
+                            break;
+                        case 2:
+                            //circular-fit
+
+                            break;
+                        case 3:
+                            //best-fit
+
+                            break;
+                        case 4:
+                            //worst-fit
+                            
+                            break;
+                    }
+
+                    executar = true;
+
+                    if (todosProcessos.length > 50){
+                        executar = false;
+                    }
+
+                    console.log(creation);
+
+                    if (executar == true) {
+                        main();
+                    } else {
+                        alert('Fim!');
+                    }
+                }, tempoEspera)
+            }
+            main();
+        }
+    </script>
+</body>
+
+</html>
