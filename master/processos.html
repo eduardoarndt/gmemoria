@@ -195,16 +195,16 @@
         });
 
         function validarDados() {
-            algoritmo = document.getElementById("algoritmo").value;
-            qtProcessos = document.getElementById("qtProcessos").value;
-            tempoEspera = document.getElementById("tempoEspera").value;
+            var algoritmo = document.getElementById("algoritmo").value;
+            var qtProcessos = document.getElementById("qtProcessos").value;
+            var tempoEspera = document.getElementById("tempoEspera").value;
 
             if (qtProcessos > 200) {
                 alert('A quantidade máxima de processos não pode ser superior a 200!');
                 return;
             } else {
                 $('#exampleModal').modal('hide');
-                program(qtProcessos, tempoEspera);
+                program(qtProcessos, tempoEspera, algoritmo);
             }
         }
 
@@ -217,6 +217,7 @@
                     this.qtCiclos = processCycles;
                     this.qtCiclosFixa = processCycles;
                     this.tamanho = processSize;
+                    this.cor = getRandomColor();
                 }
             }
 
@@ -226,7 +227,8 @@
             3 best-fit;
             4 worst-fit;
             */
-
+            
+            //parametros do programa
             algoritmo = qualAlgoritmo; 
             qtProcessos = qtProcessosParam;
             tempoEspera = tempoEsperaParam;
@@ -255,13 +257,17 @@
             //declarar variaveis DOM
 
             function atualizar() {
-                //atualizar DOM
+                //TODO: Interface gráfica
             }
 
             function getRandomInt(min, max) {
                 min = Math.ceil(min);
                 max = Math.floor(max);
                 return Math.floor(Math.random() * (max - min + 1)) + min;
+            }
+            
+            function getRandomColor() {
+                return '#'+Math.random().toString(16).substr(-6);
             }
             
             function main() {
