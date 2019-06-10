@@ -214,7 +214,7 @@
             constructor() {
                 let dumpCiclos = getRandomInt(1, 300);
                 let dumpTamanho = getRandomInt(100, 1000);
-                
+
                 this.id = idProcesso++;
                 this.nome = getNomeProcesso();
                 this.qtCiclos = dumpCiclos;
@@ -254,7 +254,7 @@
         var todosProcessos = new Array();
 
         //memoria
-        var memoria = new Array(100);
+        var memoria = new Array(5000);
 
         //DOM
         //declarar variaveis DOM
@@ -286,6 +286,7 @@
                 * */
 
                 //TESTE DE INICIALIZAÇÃO
+                /*
                 for (let i = 0; i < memoria.length; i++) {
                     memoria[i] = new Process();
                 }
@@ -295,25 +296,26 @@
                 console.log('tempo de ciclo (ms): ', tempoEspera);
                 console.log('memoria: ', memoria);
                 throw 'fim teste';
+                */
 
-                console.log('setTimeout start');
+                console.log('start');
 
                 if (todosProcessos.length == 0) {
                     //criar primeiro processo
                     todosProcessos.push(new Process());
-                    
+
                     //mover ultimo do todosProcessos para creation
                     ultimoCriado = todosProcessos[todosProcessos.length - 1];
                     creation.push(ultimoCriado);
-                    
+
                 } else if (todosProcessos.length < qtProcessos) {
                     //20% de chance de criar
                     criarNovo = getRandomInt(0, 100);
-                    
+
                     if ((criarNovo >= 0) && (criarNovo <= 20)) {
                         //criar processo e mover para todos processos
                         todosProcessos.push(new Process());
-                        
+
                         //mover ultimo do todosProcessos para creation
                         ultimoCriado = todosProcessos[todosProcessos.length - 1];
                         creation.push(ultimoCriado);
@@ -324,8 +326,60 @@
                     case '1':
                         //first-fit
                         console.log('first-fit start');
-                        //
+                        console.log(creation);
+                        console.log(memoria);
+
+                        var blocos = new Array();
+                        var posIni = null;
+                        var posFim = null;
+                        
+                        /*
+                        * TODO: Montar os blocos de memória
+                        * */
+                        
+                        for (let i = 0; i < memoria.length; i++) {
+                            if (memoria[i] == null) {
+                                //achei a primeira posição vazia...
+                                if (posIni == null) {
+                                    posIni = i;
+                                }
+
+                                //agora vou achar a posição ocupada que vem após essa...
+                                for (let j = i; j < memoria.length; j++) {
+                                    if (memoria[j] != null) {
+                                        posFim = j - 1;
+                                    }
+                                }
+
+                                //se não achou nenhum espaço ocupado, significa que toda memoria está livre...
+                                if (posFim == null) {
+                                    posFim = memoria.length - 1;
+                                }
+
+                                //pegar primeiro processo da fila creation
+                                var processo = creation.shift();
+                                
+                                console.log('processo tamanho: ', processo.tamanho);
+
+                                if ((posFim - posIni) >= processo.tamanho) {
+                                    //processo cabe na memoria
+                                    var posFimProcesso = posIni + processo.tamanho;
+                                    for (let j = posIni; j < posFimProcesso; j++) {
+                                        memoria[j] = processo;
+                                    }
+                                }
+
+                                console.log('posIni: ', posIni);
+                                console.log('posFim: ', posFim);
+                                
+                                console.log(memoria);
+                                
+                                throw 'end';
+                            }
+                        }
+
                         console.log('first-fit end');
+                        throw 'end';
                         break;
                     case '2':
                         //circular-fit
@@ -355,7 +409,7 @@
                     alert('Fim!');
                 }
 
-                console.log('setTimeout end');
+                console.log('end');
 
             }, tempoEspera)
         }
