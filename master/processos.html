@@ -32,6 +32,12 @@
             -moz-animation: gradientAnimation 5s ease infinite;
             animation: gradientAnimation 5s ease infinite;
         }
+        
+        #memoria-dom {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+        }
 
         .text-top {
             text-align: center;
@@ -182,6 +188,12 @@
     </div>
 </div>
 
+<div id="full">
+    <div id="memoria-dom">
+        <!-- javascript controla aqui dentro -->
+    </div>
+</div>
+
 <!-- Optional JavaScript -->
 <!-- jQuery first, then Popper.js, then Bootstrap JS -->
 <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
@@ -259,8 +271,39 @@
         //DOM
         //declarar variaveis DOM
 
-        function atualizar() {
+        function atualizarTela() {
             //TODO: Interface gráfica
+
+            /*
+            var node = document.createElement("li");
+            node.style.width = '10px';
+            node.style.height = '10px';
+            node.style.border = '1px solid black';
+            node.style.padding = '2px';
+            node.style.backgroundColor = '#aa33aa';
+            */
+            
+            for (let i = 0; i < memoria.length; i++) {
+                //texto
+                /*
+                var node = document.createElement("div");
+                var textnode = document.createTextNode(i);
+                node.style.padding = '1px';
+                node.style.margin = '1px';
+                node.appendChild(textnode);
+                */
+                
+                //bloco de cor
+                var node = document.createElement("div");
+                node.style.width = '10px';
+                node.style.height = '10px';
+                node.style.border = '1px solid black';
+                node.style.padding = '1px';
+                node.style.margin = '1px';
+                node.style.backgroundColor = memoria[i].cor;
+                
+                document.getElementById("memoria-dom").appendChild(node);
+            } 
         }
 
         function getRandomInt(min, max) {
@@ -286,7 +329,6 @@
                 * */
 
                 //TESTE DE INICIALIZAÇÃO
-                /*
                 for (let i = 0; i < memoria.length; i++) {
                     memoria[i] = new Process();
                 }
@@ -295,11 +337,13 @@
                 console.log('qt processos: ', qtProcessos);
                 console.log('tempo de ciclo (ms): ', tempoEspera);
                 console.log('memoria: ', memoria);
-                throw 'fim teste';
-                */
 
                 console.log('start');
-
+                
+                atualizarTela();
+                
+                throw 'fim teste';
+                
                 if (todosProcessos.length == 0) {
                     //criar primeiro processo
                     todosProcessos.push(new Process());
@@ -334,7 +378,7 @@
                         var posFim = null;
                         
                         /*
-                        * TODO: Montar os blocos de memória
+                        * TODO: Montar os blocos de memória;
                         * */
                         
                         for (let i = 0; i < memoria.length; i++) {
