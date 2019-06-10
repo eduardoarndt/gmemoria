@@ -211,12 +211,15 @@
     function program(qtProcessosParam, tempoEsperaParam, qualAlgoritmo) {
 
         class Process {
-            constructor(processCycles, processSize) {
+            constructor() {
+                let dumpCiclos = getRandomInt(1, 300);
+                let dumpTamanho = getRandomInt(100, 1000);
+                
                 this.id = idProcesso++;
                 this.nome = getNomeProcesso();
-                this.qtCiclos = processCycles;
-                this.qtCiclosFixa = processCycles;
-                this.tamanho = processSize;
+                this.qtCiclos = dumpCiclos;
+                this.qtCiclosFixa = dumpCiclos;
+                this.tamanho = dumpTamanho;
                 this.cor = getRandomColor();
             }
         }
@@ -284,7 +287,7 @@
 
                 //TESTE DE INICIALIZAÇÃO
                 for (let i = 0; i < memoria.length; i++) {
-                    memoria[i] = new Process(100, 600);
+                    memoria[i] = new Process();
                 }
 
                 console.log('algoritmo: ', algoritmo);
@@ -297,30 +300,20 @@
 
                 if (todosProcessos.length == 0) {
                     //criar primeiro processo
-                    let dumpCiclos = getRandomInt(1, 300);
-                    let dumpTamanho = getRandomInt(100, 1000);
-
-                    todosProcessos.push(new Process(
-                        dumpCiclos,     //qt ciclos
-                        dumpTamanho     //tamanho
-                    ));
-
+                    todosProcessos.push(new Process());
+                    
                     //mover ultimo do todosProcessos para creation
                     ultimoCriado = todosProcessos[todosProcessos.length - 1];
                     creation.push(ultimoCriado);
-
+                    
                 } else if (todosProcessos.length < qtProcessos) {
                     //20% de chance de criar
                     criarNovo = getRandomInt(0, 100);
+                    
                     if ((criarNovo >= 0) && (criarNovo <= 20)) {
-                        let dumpCiclos = getRandomInt(1, 300);
-                        let dumpTamanho = getRandomInt(100, 1000);
-
-                        todosProcessos.push(new Process(
-                            dumpCiclos,     //qt ciclos
-                            dumpTamanho     //tamanho
-                        ));
-
+                        //criar processo e mover para todos processos
+                        todosProcessos.push(new Process());
+                        
                         //mover ultimo do todosProcessos para creation
                         ultimoCriado = todosProcessos[todosProcessos.length - 1];
                         creation.push(ultimoCriado);
