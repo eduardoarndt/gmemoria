@@ -1,0 +1,672 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <!-- Font -->
+    <link href="https://fonts.googleapis.com/css?family=Oxygen+Mono" rel="stylesheet">
+
+    <style>
+        * {
+            font-family: 'Oxygen Mono', monospace;
+        }
+
+        #full {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            overflow-x: hidden;
+        }
+
+        #big-box {
+            background: linear-gradient(60deg, yellow, hotpink);
+            background-size: 300% 300%;
+            -webkit-animation: gradientAnimation 5s ease infinite;
+            -moz-animation: gradientAnimation 5s ease infinite;
+            animation: gradientAnimation 5s ease infinite;
+        }
+
+        .text-top {
+            text-align: center;
+        }
+
+        .txt-header {
+            text-align: center;
+            flex: 1;
+        }
+
+        .txt-title {
+            font-style: normal;
+            font-weight: 600;
+            margin: 10px;
+        }
+
+        .txt-lista {
+            text-align: left;
+            font-size: 12px;
+            line-height: 1.1;
+        }
+
+        .full-height-screen {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        .full-height {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        .list-block {
+            display: block;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .columns {
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            padding: 20px;
+        }
+
+        .rows {
+            display: flex;
+            flex-direction: row;
+            justify-content: flex-start;
+            padding: 5px;
+        }
+
+        @-webkit-keyframes gradientAnimation {
+            0% {
+                background-position: 1% 0%
+            }
+
+            50% {
+                background-position: 99% 100%
+            }
+
+            100% {
+                background-position: 1% 0%
+            }
+        }
+
+        @-moz-keyframes gradientAnimation {
+            0% {
+                background-position: 1% 0%
+            }
+
+            50% {
+                background-position: 99% 100%
+            }
+
+            100% {
+                background-position: 1% 0%
+            }
+        }
+
+        @keyframes gradientAnimation {
+            0% {
+                background-position: 1% 0%
+            }
+
+            50% {
+                background-position: 99% 100%
+            }
+
+            100% {
+                background-position: 1% 0%
+            }
+        }
+    </style>
+
+    <title>Multiprogramação - Eduardo Arndt</title>
+</head>
+
+<body>
+    <!-- Button trigger modal -->
+    <button id="btnModal" type="button" class="btn btn-primary hidden" data-toggle="modal" data-target="#exampleModal">
+        Launch demo modal
+    </button>
+
+    <!-- Modal -->
+    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Definições</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div>
+                        <label for="">Quantidade máxima de processos</label>
+                        <br>
+                        <input id="qtProcessos" type="number" style="width: 100%; padding: 5px;">
+                    </div>
+                    <br>
+                    <div>
+                        <label for="">Tempo de espera (ms)</label>
+                        <br>
+                        <input id="tempoEspera" type="number" style="width: 100%; padding: 5px;">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" onclick="validarDados();">Salvar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="full">
+
+        <div class="container-fluid rows">
+            <div class="text-top columns" style="text-align: left">
+                <span>Total de Processos: </span>
+                <span>Total de Ciclos: </span>
+                <span>Tempo de Execução Médio: </span>
+            </div>
+            <div class="text-top columns" style="text-align: left">
+                <span id="totalDeProcessos"></span>
+                <span id="totalDeCiclos"></span>
+                <span id="execucaoMedio"></span>
+            </div>
+            <!--  -->
+
+            <div class="text-top columns" style="text-align: left">
+                <span>Criação: </span>
+                <span>Apto: </span>
+                <span>Execução: </span>
+            </div>
+            <div class="text-top columns" style="text-align: left">
+                <span id="passouCriacao"></span>
+                <span id="passouApto"></span>
+                <span id="passouExecucao"></span>
+            </div>
+            <!--  -->
+
+            <div class="text-top columns" style="text-align: left">
+                <span>Bloqueado: </span>
+                <span>Finalizado: </span>
+                <span>Média de Espera Aptos: </span>
+            </div>
+            <div class="text-top columns" style="text-align: left">
+                <span id="passouBloqueado"></span>
+                <span id="passouFinal"></span>
+                <span id="esperaMedia"></span>
+            </div>
+            <!--  -->
+
+            <div class="text-top columns" style="text-align: left">
+                <span>Quant. retirados por limite: </span>
+                <span>Quant. retirados por bloqueio: </span>
+            </div>
+            <div class="text-top columns" style="text-align: left">
+                <span id="saiuDeExec"></span>
+                <span id="saiuDeExecBloq"></span>
+            </div>
+        </div>
+
+        <div class="container-fluid full-height-screen">
+            <div id="big-box" class="container-fluid full-height" style="display: flex; flex-direction: row;">
+                <div class="txt-header list-block">
+                    <div class="txt-title">Criação</div>
+                    <ol id="creation" class="txt-lista">
+                        <!-- javascript controla itens aqui dentro -->
+                    </ol>
+                </div>
+                <div class="txt-header list-block">
+                    <div class="txt-title">Apto</div>
+                    <ol id="ready" class="txt-lista">
+                        <!-- javascript controla itens aqui dentro -->
+                    </ol>
+                </div>
+                <div class="txt-header list-block">
+                    <div class="txt-title">Execução</div>
+                    <ol id="running" class="txt-lista">
+                        <!-- javascript controla itens aqui dentro -->
+                    </ol>
+                </div>
+                <div class="txt-header list-block">
+                    <div class="txt-title">Bloqueado</div>
+                    <ol id="blocked" class="txt-lista">
+                        <!-- javascript controla itens aqui dentro -->
+                    </ol>
+                    <!-- 
+                    <br>
+                    <div class="txt-title">Bloqueados HD</div>
+                    <ol id="blockedDisk" class="txt-lista">
+                    </ol>
+                    <br>
+                    <div class="txt-title">Bloqueados Video</div>
+                    <ol id="blockedVideo" class="txt-lista">
+                    </ol>
+                    <br>
+                    <div class="txt-title">Bloqueados Impressora</div>
+                    <ol id="blockedPrinter" class="txt-lista">
+                    </ol>
+                     -->
+                </div>
+                <div class="txt-header list-block">
+                    <div class="txt-title">Finalizado</div>
+                    <ol id="exit" class="txt-lista">
+                        <!-- javascript controla itens aqui dentro -->
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+    <script>
+
+        $(document).ready(function () {
+            $('#btnModal').click();
+        });
+
+        function validarDados() {
+            qtProcessos = document.getElementById("qtProcessos").value;
+            tempoEspera = document.getElementById("tempoEspera").value;
+
+            if (qtProcessos > 200) {
+                alert('A quantidade máxima de processos não pode ser superior a 200!');
+                return;
+            } else {
+                $('#exampleModal').modal('hide');
+                program(qtProcessos, tempoEspera);
+            }
+        }
+
+        function program(qtProcessosParam, tempoEsperaParam) {
+
+            class Process {
+                constructor(processId, processName, processCycles, processBlockLength) {
+                    this.id = processId;
+                    this.nome = processName;
+                    this.qtCiclos = processCycles;
+                    this.qtCiclosFixa = processCycles;
+                    this.tamBloq = processBlockLength;
+                }
+            }
+
+            qtProcessos = qtProcessosParam;
+            tempoEspera = tempoEsperaParam;
+
+            //controla execução do programa
+            var executar = true;
+
+            //gerador de ids para processos... só usar $idProcesso++;
+            var idProcesso = 0;
+
+            //ciclos que se passaram;
+            var ciclos = 0;
+
+            //arrays de estados
+            var creation = new Array();
+            var ready = new Array();
+            var running = new Array();
+            var blocked = new Array();
+            var blockedDisk = new Array();
+            var blockedVideo = new Array();
+            var blockedPrinter = new Array();
+            var exit = new Array();
+
+            //verificar estados que o processo passou...
+            var passouCriacao = new Array();
+            var criacaoCont = 0;
+
+            var passouApto = new Array();
+            var aptoCont = 0;
+
+            var passouExecucao = new Array();
+            var execCont = 0;
+
+            var passouBloqueado = new Array();
+            var bloqCont = 0;
+
+            var passouFinal = new Array();
+            var finalCont = 0;
+
+            var saiuDeExec = 0;
+            var saiuDeExecBloq = 0;
+
+            var execCiclos = 0;
+            var mediaEsperaAptos = 0;
+
+            //todos processos
+            var todosProcessos = new Array();
+            //maximo de ciclos que um processo pode ficar no processador...
+            var maxCiclos = 30;
+
+            //DOM
+            var creationList = document.getElementById("creation");
+            var readyList = document.getElementById("ready");
+            var runningList = document.getElementById("running");
+            var blockedList = document.getElementById("blocked");
+            var blockedDiskList = document.getElementById("blockedDisk");
+            var blockedVideoList = document.getElementById("blockedVideo");
+            var blockedPrinterList = document.getElementById("blockedPrinter");
+            var exitList = document.getElementById("exit");
+
+            function atualizar() {
+                creation.forEach(element => {
+                    if (!(passouCriacao.includes(element.id))) {
+                        criacaoCont++;
+                        passouCriacao.push(element.id);
+                    }
+                });
+
+                ready.forEach(element => {
+                    if (!(passouApto.includes(element.id))) {
+                        aptoCont++;
+                        passouApto.push(element.id);
+                    }
+                });
+
+                running.forEach(element => {
+                    if (!(passouExecucao.includes(element.id))) {
+                        execCont++;
+                        passouExecucao.push(element.id);
+                    }
+                });
+
+                blocked.forEach(element => {
+                    if (!(passouBloqueado.includes(element.id))) {
+                        bloqCont++;
+                        passouBloqueado.push(element.id);
+                    }
+                });
+
+                exit.forEach(element => {
+                    if (!(passouFinal.includes(element.id))) {
+                        finalCont++;
+                        passouFinal.push(element.id);
+                    }
+                });
+
+                execCiclos = 0;
+                totalDeProcessos = todosProcessos.length;
+                totalDeCiclos = ciclos;
+
+                todosProcessos.forEach(element => {
+                    execCiclos += element.qtCiclosFixa;
+                });
+
+                mediaEsperaAptos = 0;
+                contadorLoco = 0;
+                ready.forEach(element => {
+                    contadorLoco++;
+                    mediaEsperaAptos = mediaEsperaAptos + contadorLoco * 30;
+                });
+
+
+
+                execucaoMedio = execCiclos / totalDeProcessos;
+                div = ready.length;
+                if (div != 0){
+                    mediaEsperaAptos = mediaEsperaAptos / ready.length;
+                } else {
+                    mediaEsperaAptos = 0;
+                }
+
+                document.getElementById('totalDeProcessos').innerHTML = totalDeProcessos;
+                document.getElementById('totalDeCiclos').innerHTML = totalDeCiclos;
+                document.getElementById('execucaoMedio').innerHTML = Math.round(execucaoMedio * 10) / 10;
+
+                document.getElementById('passouCriacao').innerHTML = criacaoCont;
+                document.getElementById('passouApto').innerHTML = aptoCont;
+                document.getElementById('passouExecucao').innerHTML = execCont;
+                document.getElementById('passouBloqueado').innerHTML = bloqCont;
+                document.getElementById('passouFinal').innerHTML = finalCont;
+
+                document.getElementById('esperaMedia').innerHTML = mediaEsperaAptos;
+
+                document.getElementById('saiuDeExec').innerHTML = saiuDeExec;
+                document.getElementById('saiuDeExecBloq').innerHTML = saiuDeExecBloq;
+
+                //listar criacao
+                while (creationList.firstChild) {
+                    creationList.removeChild(creationList.firstChild);
+                }
+
+                creation.forEach(element => {
+                    var node = document.createElement("LI");
+                    var textnode = document.createTextNode(element['nome']);
+                    node.appendChild(textnode);
+                    creationList.appendChild(node);
+                });
+
+                //listar aptos
+                while (readyList.firstChild) {
+                    readyList.removeChild(readyList.firstChild);
+                }
+
+                ready.forEach(element => {
+                    var node = document.createElement("LI");
+                    var textnode = document.createTextNode(element['nome']);
+                    node.appendChild(textnode);
+                    readyList.appendChild(node);
+                });
+
+                //listar execucao
+                while (runningList.firstChild) {
+                    runningList.removeChild(runningList.firstChild);
+                }
+
+                running.forEach(element => {
+                    var node = document.createElement("LI");
+                    var textnode = document.createTextNode(element['nome']);
+                    node.appendChild(textnode);
+                    runningList.appendChild(node);
+                });
+
+                //listar bloqueados
+                while (blockedList.firstChild) {
+                    blockedList.removeChild(blockedList.firstChild);
+                }
+
+                blocked.forEach(element => {
+                    var node = document.createElement("LI");
+                    var textnode = document.createTextNode(element['nome']);
+                    node.appendChild(textnode);
+                    blockedList.appendChild(node);
+                });
+
+                //listar finalizados
+                while (exitList.firstChild) {
+                    exitList.removeChild(exitList.firstChild);
+                }
+
+                exit.forEach(element => {
+                    var node = document.createElement("LI");
+                    var textnode = document.createTextNode(element['nome']);
+                    node.appendChild(textnode);
+                    exitList.appendChild(node);
+                });
+
+            }
+
+            function getRandomInt(min, max) {
+                min = Math.ceil(min);
+                max = Math.floor(max);
+                return Math.floor(Math.random() * (max - min + 1)) + min;
+            }
+
+
+            var processoCiclos = 0;
+            var controleCiclos = 0;
+
+            function main() {
+                setTimeout(function () {
+
+                    atualizar();
+
+                    ciclos++;
+
+                    creation.forEach(element => {
+                        ready.push(element);
+                    });
+
+                    creation = [];
+
+                    for (let index = 0; index < blocked.length; index++) {
+                        const element = blocked[index];
+                        element.tamBloq--;
+
+                        if (element.tamBloq == 0) {
+                            ready.push(element);
+                            blocked.splice(index, 1);
+                        }
+                    }
+
+                    //implementar fila para cada disp E/S
+                    let dumpCiclos = getRandomInt(50, 200);
+                    if (todosProcessos.length == 0) {
+                        todosProcessos.push(new Process(
+                            idProcesso++,                                                   //id
+                            "P" + Math.random().toString(36).substr(2, 5),                  //nome
+                            dumpCiclos,                                                     //qt ciclos
+                            dumpCiclos,                                                     //qt ciclosFixo
+                            0,                                                              //ciclos q vai ficar bloqueado
+                        ));
+
+                        //mover ultimo do todosProcessos para creation
+                        ultimoCriado = todosProcessos[todosProcessos.length - 1];
+                        creation.push(ultimoCriado);
+                    } else if (todosProcessos.length < qtProcessos) {
+
+                        criarNovo = getRandomInt(0, 100);
+
+                        if ((criarNovo >= 0) && (criarNovo <= 10)) {
+
+                            //criar no todosProcessos
+                            let dumpCiclos = getRandomInt(50, 200);
+                            todosProcessos.push(new Process(
+                                idProcesso++,                                                   //id
+                                "P" + Math.random().toString(36).substr(2, 5),                  //nome
+                                dumpCiclos,                                                     //qt ciclos
+                                dumpCiclos,                                                     //qt ciclosFixo
+                                0,                                                              //ciclos q vai ficar bloqueado
+                            ));
+
+                            //mover ultimo do todosProcessos para creation
+                            ultimoCriado = todosProcessos[todosProcessos.length - 1];
+                            creation.push(ultimoCriado);
+                        }
+                    }
+
+                    atualizar();
+
+                    //throw 'Teste 2: Processos aptos.';
+
+                    if ((running.length < 1) && (ready.length > 0)) {
+                        running.push(ready[0]);
+                        ready.shift();
+
+                        if (running[0].qtCiclos > 30) {
+                            controleCiclos = 30;
+                        } else {
+                            controleCiclos = running[0].qtCiclos;
+                        }
+                    }
+
+                    atualizar();
+
+                    //throw 'Teste 3: Processos em execução.';
+
+                    if (running.length == 1) {
+                        if (processoCiclos < controleCiclos) {
+                            processoCiclos++;
+                            running[0].qtCiclos--;
+
+                            //primeiro ciclo sempre é de CPU
+                            if (processoCiclos != 0) {
+                                recurso = getRandomInt(1, 100);
+                            } else {
+                                recurso = 0;
+                            }
+
+                            if (recurso == 1) {
+
+                                saiuDeExecBloq++;
+
+                                qualRecurso = getRandomInt(1, 3);
+
+                                if (qualRecurso == 1) {                         //Disco
+                                    running[0].tamBloq = getRandomInt(200, 300);
+                                    blockedDisk.push(running[0]);
+                                } else if (qualRecurso == 2) {                  //Video
+                                    running[0].tamBloq = getRandomInt(100, 200);
+                                    blockedVideo.push(running[0]);
+                                } else {                                        //Impressora
+                                    running[0].tamBloq = getRandomInt(300, 400);
+                                    blockedPrinter.push(running[0]);
+                                }
+
+                                blocked.push(running[0]);
+                                running.shift();
+                                processoCiclos = 0;
+                                controleCiclos = 0;
+                            } else {
+                                //como é feita a soma lá em cima, a condicao abaixo é atingida sempre que chega ao limite de 30 ciclos
+                                if ((running[0].qtCiclos > 0) && (processoCiclos == controleCiclos)) {
+                                    ready.push(running[0]);
+                                    running.shift();
+                                    processoCiclos = 0;
+                                    controleCiclos = 0;
+                                    saiuDeExec++;
+                                } else if (running[0].qtCiclos == 0) {
+                                    exit.push(running[0]);
+                                    running.shift();
+                                    processoCiclos = 0;
+                                    controleCiclos = 0;
+                                }
+                            }
+                        }
+                    }
+
+                    if (exit.length == todosProcessos.length) {
+                        executar = false;
+                        atualizar();
+
+                        console.log(creation);
+                        console.log(ready);
+                        console.log(running);
+                        console.log(blocked);
+                        console.log(blockedDisk);
+                        console.log(blockedVideo);
+                        console.log(blockedPrinter);
+                        console.log(exit);
+                    }
+
+                    if (executar == true) {
+                        main();
+                    } else {
+                        alert('Fim!');
+                    }
+                }, tempoEspera)
+            }
+            main();
+        }
+    </script>
+</body>
+
+</html>
