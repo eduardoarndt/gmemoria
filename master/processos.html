@@ -251,7 +251,7 @@
         var todosProcessos = new Array();
 
         //memoria
-        var memoria = new Array();
+        var memoria = new Array(100);
 
         //DOM
         //declarar variaveis DOM
@@ -276,18 +276,22 @@
 
         function main() {
             setTimeout(function () {
-
                 /*
+                * Funcionamento do setTimeout function
                 * É aplicado o delay definido em tempoEspera
                 * antes de executar a função
                 * */
 
-                /*
-                console.log(typeof algoritmo);
-                console.log(qtProcessos);
-                console.log(tempoEspera);
-                throw 'parametros';
-                */
+                //TESTE DE INICIALIZAÇÃO
+                for (let i = 0; i < memoria.length; i++) {
+                    memoria[i] = new Process(100, 600);
+                }
+
+                console.log('algoritmo: ', algoritmo);
+                console.log('qt processos: ', qtProcessos);
+                console.log('tempo de ciclo (ms): ', tempoEspera);
+                console.log('memoria: ', memoria);
+                throw 'fim teste';
 
                 console.log('setTimeout start');
 
