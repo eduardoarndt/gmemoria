@@ -273,14 +273,10 @@
             function atualizarTela() {
                 //TODO: Interface gráfica
 
-                /*
-                var node = document.createElement("li");
-                node.style.width = '10px';
-                node.style.height = '10px';
-                node.style.border = '1px solid black';
-                node.style.padding = '2px';
-                node.style.backgroundColor = '#aa33aa';
-                */
+                while (document.getElementById("memoria-dom").firstChild) {
+                    document.getElementById("memoria-dom").removeChild(document.getElementById("memoria-dom").firstChild);
+                }
+
 
                 for (var i = 0; i < memoria.length; i++) {
                     //texto
@@ -300,7 +296,12 @@
                     node.style.border = '1px solid black';
                     node.style.padding = '1px';
                     node.style.margin = '1px';
-                    node.style.backgroundColor = memoria[i].cor;
+
+                    if (memoria[i] != null) {
+                        node.style.backgroundColor = memoria[i].cor;
+                    } else {
+                        node.style.backgroundColor = '#FFFFFF';
+                    }
 
                     //document.getElementById("memoria-dom").appendChild(textnode);
                     document.getElementById("memoria-dom").appendChild(node);
@@ -395,8 +396,10 @@
                                         posIni = i;
                                     }
                                 }
+                            }
 
-                                if (memoria[i] != null) {
+                            for (var i = 0; i < memoria.length; i++) {
+                                if ((memoria[i] != null) && (i > posIni)) {
                                     //achei a proxima posicao que esta ocupada
                                     if (posFim == null) {
                                         posFim = i - 1;
@@ -410,15 +413,19 @@
                             }
 
                             //pegar primeiro processo da fila creation
-                            var processo = creation.shift();
+                            if (creation[0] != null) {
 
-                            console.log('processo tamanho: ', processo.tamanho);
+                                var processo = creation.shift();
 
-                            if ((posFim - posIni) >= processo.tamanho) {
-                                //processo cabe na memoria
-                                var posFimProcesso = posIni + processo.tamanho;
-                                for (let j = posIni; j < posFimProcesso; j++) {
-                                    memoria[j] = processo;
+                                if (processo != null) {
+                                    console.log('processo tamanho: ', processo.tamanho);
+                                    if ((posFim - posIni) >= processo.tamanho) {
+                                        //processo cabe na memoria
+                                        var posFimProcesso = posIni + processo.tamanho;
+                                        for (let j = posIni; j < posFimProcesso; j++) {
+                                            memoria[j] = processo;
+                                        }
+                                    }
                                 }
                             }
 
@@ -427,7 +434,7 @@
                             console.log(memoria);
                             console.log('first-fit end');
                             atualizarTela();
-                            throw 'end';
+                            //throw 'end';
                             break;
                         case '2':
                             //circular-fit
@@ -445,7 +452,7 @@
 
                     executar = true;
 
-                    if (todosProcessos.length > 12) {
+                    if (todosProcessos.length > 20) {
                         executar = false;
                     }
 
