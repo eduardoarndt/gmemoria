@@ -137,13 +137,12 @@
         }
     </style>
 
-    <title>Multiprogramação - Eduardo Arndt</title>
+    <title>Gerenciamento de Memória</title>
 </head>
 
 <body>
     <!-- Button trigger modal -->
     <button id="btnModal" type="button" class="btn btn-primary hidden" data-toggle="modal" data-target="#exampleModal">
-        Launch demo modal
     </button>
 
     <!-- Modal -->
@@ -151,7 +150,7 @@
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Definições</h5>
+                    <h5 class="modal-title" id="exampleModalLabel">Definições - Gerenciamento de Memória</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -223,7 +222,7 @@
 
             class Process {
                 constructor() {
-                    let dumpCiclos = getRandomInt(1, 300);
+                    let dumpCiclos = getRandomInt(1, 10);
                     let dumpTamanho = getRandomInt(100, 1000);
 
                     this.id = idProcesso++;
@@ -352,6 +351,7 @@
     
                     */
 
+
                     if (todosProcessos.length == 0) {
                         //criar primeiro processo
                         todosProcessos.push(new Process());
@@ -360,11 +360,13 @@
                         ultimoCriado = todosProcessos[todosProcessos.length - 1];
                         creation.push(ultimoCriado);
 
-                    } else if (todosProcessos.length < qtProcessos) {
+                    } 
+                    
+                    if (todosProcessos.length < qtProcessos) {
                         //20% de chance de criar um processo
                         criarNovo = getRandomInt(1, 100);
 
-                        if ((criarNovo >= 1) && (criarNovo <= 20)) {
+                        if ((criarNovo >= 1) && (criarNovo <= 100)) {
                             //criar processo e mover para todos processos
                             todosProcessos.push(new Process());
 
@@ -377,17 +379,38 @@
                     switch (algoritmo) {
                         case '1':
                             //first-fit
-                            console.log('first-fit start');
-                            console.log(creation);
-                            console.log(memoria);
+                            //console.log('first-fit start');
+                            //console.log(creation);
+                            //console.log(memoria);
 
                             var blocos = new Array();
                             var posIni = null;
                             var posFim = null;
 
-                            /*
-                            * TODO: Montar os blocos de memória;
-                            * */
+                            var arrayDosQueTemQueDiminuirCiclo = new Array();
+
+                            //decrementar ciclos restantes do processo
+                            for (var i = 0; i < memoria.length; i++) {
+                                if (memoria[i] != null) {
+                                    //console.log('bugs: ', memoria[i]);
+                                    if (memoria[i].qtCiclos == 0) {
+                                        //libero memória
+                                        memoria[i] = null;
+                                    } else {
+                                        if (!arrayDosQueTemQueDiminuirCiclo.includes(memoria[i])) {
+                                            arrayDosQueTemQueDiminuirCiclo.push(memoria[i]);
+                                        }
+                                    }
+                                }
+                            }
+
+                            arrayDosQueTemQueDiminuirCiclo.forEach(element => {
+                                element.qtCiclos--;
+
+                                if (element.qtCiclos == 0) {
+                                    done.push(element);
+                                }
+                            });
 
                             for (var i = 0; i < memoria.length; i++) {
                                 if (memoria[i] == null) {
@@ -418,7 +441,7 @@
                                 var processo = creation.shift();
 
                                 if (processo != null) {
-                                    console.log('processo tamanho: ', processo.tamanho);
+                                    //console.log('processo tamanho: ', processo.tamanho);
                                     if ((posFim - posIni) >= processo.tamanho) {
                                         //processo cabe na memoria
                                         var posFimProcesso = posIni + processo.tamanho;
@@ -429,10 +452,10 @@
                                 }
                             }
 
-                            console.log('posIni: ', posIni);
-                            console.log('posFim: ', posFim);
-                            console.log(memoria);
-                            console.log('first-fit end');
+                            //console.log('posIni: ', posIni);
+                            //console.log('posFim: ', posFim);
+                            //console.log(memoria);
+                            //console.log('first-fit end');
                             atualizarTela();
                             //throw 'end';
                             break;
@@ -452,11 +475,9 @@
 
                     executar = true;
 
-                    if (todosProcessos.length > 20) {
+                    if (done.length == qtProcessos) {
                         executar = false;
                     }
-
-                    console.log(creation);
 
                     if (executar == true) {
                         main();
@@ -464,7 +485,10 @@
                         alert('Fim!');
                     }
 
-                    console.log('end');
+                    console.log('done: ', done.length);
+                    console.log('creation: ', creation.length);
+                    console.log('todos: ', todosProcessos.length);
+                    console.log('qt process: ', qtProcessos);
 
                 }, tempoEspera)
             }
