@@ -146,7 +146,8 @@
     </button>
 
     <!-- Modal -->
-    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -266,10 +267,19 @@
             //memoria
             var memoria = new Array(5000);
 
+            //memory para best fit
+            memory = new Array(5000);
+            memory[200] = new Process();
+            memory[1000] = new Process();
+            memory[3000] = new Process();
+            memory[3500] = new Process();
+            memory[4999] = new Process();
+
+
             //DOM
             //declarar variaveis DOM
 
-            function atualizarTela() {
+            function atualizarTela(memoria) {
                 //TODO: Interface gráfica
 
                 while (document.getElementById("memoria-dom").firstChild) {
@@ -321,6 +331,43 @@
                 return "proc-" + Math.random().toString(36).substr(2, 5);
             }
 
+            function memoryBlocks(memoria) {
+
+                blocos = new Array();
+
+                posIni = null;
+                posFim = null;
+
+                for (let index = 0; index < memoria.length; index++) {
+                    const element = memoria[index];
+
+                    if (element == null) {
+                        if (posIni == null) {
+                            posIni = index;
+                        }
+                    }
+
+                    if (element != null && index > posIni) {
+                        if (posFim == null) {
+                            posFim = index;
+                        }
+                    }
+
+                    if (posIni != null && posFim != null) {
+                        blocos.push({
+                            'posIni': posIni,
+                            'posFim': posFim,
+                            'espacoLivre': posFim - posIni
+                        });
+
+                        posIni = null;
+                        posFim = null;
+                    }
+                }
+
+                return blocos;
+            }
+
             function main() {
                 setTimeout(function () {
                     /*
@@ -359,10 +406,10 @@
                         //mover ultimo do todosProcessos para creation
                         ultimoCriado = todosProcessos[todosProcessos.length - 1];
                         creation.push(ultimoCriado);
-
-                    } 
-                    
-                    if (todosProcessos.length < qtProcessos) {
+                        console.log('primeiro procersso creation');
+                        console.log(creation[0].tamanho);
+                        //throw 'halt';
+                    } else if (todosProcessos.length < qtProcessos) {
                         //20% de chance de criar um processo
                         criarNovo = getRandomInt(1, 100);
 
@@ -378,6 +425,8 @@
 
                     switch (algoritmo) {
                         case '1':
+                            console.log(creation);
+                            throw 'creation';
                             //first-fit
                             //console.log('first-fit start');
                             //console.log(creation);
@@ -436,8 +485,8 @@
                             }
 
                             //pegar primeiro processo da fila creation
-                            if (creation[0] != null) { 
- 
+                            if (creation[0] != null) {
+
                                 var processo = creation.shift();
 
                                 if (processo != null) {
@@ -466,9 +515,79 @@
                         case '3':
                             //best-fit
 
+                            //primeiro mapear memória
+                            var blocos = memoryBlocks(memory);
+
+                            blocos = blocos.sort((a, b) => a.espacoLivre - b.espacoLivre); //ordenar por espaco livre
+
+                            console.log('blocos', blocos);
+
+                            blocos.every(function (bloco, index) {
+                                if (bloco.espacoLivre >= creation[0].tamanho) {
+                                    console.log('bloco', bloco);
+                                    console.log('index', index);
+                                    let posFimProcesso = bloco.posIni + creation[0].tamanho;
+                                    for (let index = bloco.posIni; index < posFimProcesso; index++) {
+                                        memory[index] = creation[0];
+                                    }
+                                    creation.shift();
+                                } else {
+                                    if (index == blocos.length - 1) {
+                                        //entra somente na ultima iteracao do every
+                                        //processo nao encaixa em nenhum bloco, vai para ultima pos da fila
+                                        processo = creation.shift();
+                                        creation.push(processo);
+                                        return false;
+                                    } else {
+                                        //se nao for a ultima iteracao segue para a proxima
+                                        return true;
+                                    }
+                                }
+                            })
+
+                            console.log(memory);
+
+                            atualizarTela(memory);
+
+                            //throw 'S';
+
                             break;
                         case '4':
                             //worst-fit
+
+                            //primeiro mapear memória
+                            var blocos = memoryBlocks(memory);
+
+                            blocos = blocos.sort((a, b) => b.espacoLivre - a.espacoLivre); //ordenar por espaco livre
+
+                            blocos.every(function (bloco, index) {
+                                if (bloco.espacoLivre >= creation[0].tamanho) {
+                                    console.log('bloco', bloco);
+                                    console.log('index', index);
+                                    let posFimProcesso = bloco.posIni + creation[0].tamanho;
+                                    for (let index = bloco.posIni; index < posFimProcesso; index++) {
+                                        memory[index] = creation[0];
+                                    }
+                                    creation.shift();
+                                } else {
+                                    if (index == blocos.length - 1) {
+                                        //entra somente na ultima iteracao do every
+                                        //processo nao encaixa em nenhum bloco, vai para ultima pos da fila
+                                        processo = creation.shift();
+                                        creation.push(processo);
+                                        return false;
+                                    } else {
+                                        //se nao for a ultima iteracao segue para a proxima
+                                        return true;
+                                    }
+                                }
+                            })
+
+                            console.log(memory);
+
+                            atualizarTela(memory);
+
+                            //throw 'S';
 
                             break;
                     }
@@ -485,10 +604,10 @@
                         alert('Fim!');
                     }
 
-                    console.log('done: ', done.length);
-                    console.log('creation: ', creation.length);
-                    console.log('todos: ', todosProcessos.length);
-                    console.log('qt process: ', qtProcessos);
+                    //console.log('done: ', done.length);
+                    //console.log('creation: ', creation.length);
+                    //console.log('todos: ', todosProcessos.length);
+                    //console.log('qt process: ', qtProcessos);
 
                 }, tempoEspera)
             }
