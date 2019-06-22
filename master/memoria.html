@@ -519,30 +519,32 @@
                             blocos = blocos.sort((a, b) => a.espacoLivre - b.espacoLivre); //ordenar por espaco livre
 
                             console.log('blocos', blocos);
-
-                            blocos.every(function (bloco, index) {
-                                if (bloco.espacoLivre >= creation[0].tamanho) {
-                                    console.log('bloco', bloco);
-                                    console.log('index', index);
-                                    let posFimProcesso = bloco.posIni + creation[0].tamanho;
-                                    for (let index = bloco.posIni; index < posFimProcesso; index++) {
-                                        memory[index] = creation[0];
-                                    }
-                                    creation.shift();
-                                } else {
-                                    if (index == blocos.length - 1) {
-                                        //entra somente na ultima iteracao do every
-                                        //processo nao encaixa em nenhum bloco, vai para ultima pos da fila
-                                        processo = creation.shift();
-                                        creation.push(processo);
-                                        return false;
+                            
+                            if (creation[0] != null) {
+                                blocos.every(function (bloco, index) {
+                                    if (bloco.espacoLivre >= creation[0].tamanho) {
+                                        console.log('bloco', bloco);
+                                        console.log('index', index);
+                                        let posFimProcesso = bloco.posIni + creation[0].tamanho;
+                                        for (let index = bloco.posIni; index < posFimProcesso; index++) {
+                                            memory[index] = creation[0];
+                                        }
+                                        creation.shift();
                                     } else {
-                                        //se nao for a ultima iteracao segue para a proxima
-                                        return true;
+                                        if (index == blocos.length - 1) {
+                                            //entra somente na ultima iteracao do every
+                                            //processo nao encaixa em nenhum bloco, vai para ultima pos da fila
+                                            processo = creation.shift();
+                                            creation.push(processo);
+                                            return false;
+                                        } else {
+                                            //se nao for a ultima iteracao segue para a proxima
+                                            return true;
+                                        }
                                     }
-                                }
-                            })
-
+                                })
+                            }
+                            
                             console.log(memory);
 
                             atualizarTela(memory);
