@@ -223,7 +223,7 @@
 
             class Process {
                 constructor() {
-                    let dumpCiclos = getRandomInt(1, 10);
+                    let dumpCiclos = getRandomInt(10, 15);
                     let dumpTamanho = getRandomInt(100, 1000);
 
                     this.id = idProcesso++;
@@ -258,29 +258,24 @@
 
             //arrays de estados
             var creation = new Array();   //criado
-            var running = new Array();    //rodando, está na memória
             var done = new Array();       //já foi executado e finalizou
 
             //todos processos
             var todosProcessos = new Array();
 
+            arrayDosQueTemQueDiminuirCiclo = new Array();
+
             //memoria
-            var memoria = new Array(5000);
-
-            //memory para best fit
             memory = new Array(5000);
-            memory[200] = new Process();
-            memory[1000] = new Process();
-            memory[3000] = new Process();
-            memory[3500] = new Process();
-            memory[4999] = new Process();
+            //memory[200] = new Process();
+            //memory[1000] = new Process();
+            //memory[3000] = new Process();
+            //memory[3500] = new Process();
+            memory[5000] = 'fim';
 
-
-            //DOM
-            //declarar variaveis DOM
+            var ContadorCircular = 0;
 
             function atualizarTela(memoria) {
-                //TODO: Interface gráfica
 
                 while (document.getElementById("memoria-dom").firstChild) {
                     document.getElementById("memoria-dom").removeChild(document.getElementById("memoria-dom").firstChild);
@@ -288,15 +283,6 @@
 
 
                 for (var i = 0; i < memoria.length; i++) {
-                    //texto
-                    /*
-                    var node = document.createElement("div");
-                    var textnode = document.createTextNode(i);
-                    node.style.padding = '1px';
-                    node.style.margin = '1px';
-                    node.appendChild(textnode);
-                    */
-
                     //bloco de cor
                     var node = document.createElement("div");
                     var textnode = document.createTextNode(i);
@@ -312,7 +298,6 @@
                         node.style.backgroundColor = '#FFFFFF';
                     }
 
-                    //document.getElementById("memoria-dom").appendChild(textnode);
                     document.getElementById("memoria-dom").appendChild(node);
                 }
             }
@@ -348,14 +333,12 @@
                     }
 
                     if (element != null && index > posIni) {
-                        if (posFim == null) {
-                            posFim = index;
-                        }
+                        posFim = index;
                     }
 
                     if (posIni != null && posFim != null) {
                         blocos.push({
-                            'posIni': posIni,
+                            'posIni': posIni - 1,
                             'posFim': posFim,
                             'espacoLivre': posFim - posIni
                         });
@@ -365,39 +348,27 @@
                     }
                 }
 
+                if (blocos.length == 0) {
+                    blocos.push({
+                        'posIni': 0,
+                        'posFim': memoria.length,
+                        'espacoLivre': memoria.length
+                    });
+                }
+
                 return blocos;
+            }
+
+            function compactarMemoria(memoria) {
+                var memoriaCompactada = memoria.filter(function (el) {
+                    return el != null;
+                });
+
+                return memoriaCompactada;
             }
 
             function main() {
                 setTimeout(function () {
-                    /*
-                    * Funcionamento do setTimeout function
-                    * É aplicado o delay definido em tempoEspera
-                    * antes de executar a função
-                    * */
-
-
-
-                    //TESTE DE INICIALIZAÇÃO
-                    /*
-                    for (var i = 0; i < memoria.length; i++) {
-                        memoria[i] = new Process();
-                    }
-    
-    
-                    console.log('algoritmo: ', algoritmo);
-                    console.log('qt processos: ', qtProcessos);
-                    console.log('tempo de ciclo (ms): ', tempoEspera);
-                    console.log('memoria: ', memoria);
-    
-                    console.log('start');
-                    
-                    atualizarTela();
-                    
-                    //throw 'fim teste';
-    
-                    */
-
 
                     if (todosProcessos.length == 0) {
                         //criar primeiro processo
@@ -406,9 +377,6 @@
                         //mover ultimo do todosProcessos para creation
                         ultimoCriado = todosProcessos[todosProcessos.length - 1];
                         creation.push(ultimoCriado);
-                        console.log('primeiro procersso creation');
-                        console.log(creation[0].tamanho);
-                        //throw 'halt';
                     } else if (todosProcessos.length < qtProcessos) {
                         //20% de chance de criar um processo
                         criarNovo = getRandomInt(1, 100);
@@ -416,110 +384,94 @@
                         if ((criarNovo >= 1) && (criarNovo <= 20)) {
                             //criar processo e mover para todos processos
                             todosProcessos.push(new Process());
-
                             //mover ultimo do todosProcessos para creation
                             ultimoCriado = todosProcessos[todosProcessos.length - 1];
                             creation.push(ultimoCriado);
                         }
                     }
 
+                    //decrementar ciclos restantes do processo
+                    for (var i = 0; i < memory.length; i++) {
+                        if (memory[i] != null) {
+                            if (memory[i].qtCiclos == 0) {
+                                memory[i] = null;
+                            } else {
+                                if (!arrayDosQueTemQueDiminuirCiclo.includes(memory[i])) {
+                                    arrayDosQueTemQueDiminuirCiclo.push(memory[i]);
+                                }
+                            }
+                        }
+                    }
+
+                    arrayDosQueTemQueDiminuirCiclo.forEach(element => {
+                        element.qtCiclos--;
+                        if (element.qtCiclos == 0) {
+                            done.push(element);
+                        }
+                    });
+
                     switch (algoritmo) {
                         case '1':
                             //first-fit
-                            console.log('first-fit start');
-                            //console.log(creation);
-                            //console.log(memoria);
 
-                            var blocos = new Array();
-                            var posIni = null;
-                            var posFim = null;
+                            var blocos = memoryBlocks(memory);
 
-                            var arrayDosQueTemQueDiminuirCiclo = new Array();
-
-                            //decrementar ciclos restantes do processo
-                            for (var i = 0; i < memoria.length; i++) {
-                                if (memoria[i] != null) {
-                                    //console.log('bugs: ', memoria[i]);
-                                    if (memoria[i].qtCiclos == 0) {
-                                        //libero memória
-                                        memoria[i] = null;
-                                    } else {
-                                        if (!arrayDosQueTemQueDiminuirCiclo.includes(memoria[i])) {
-                                            arrayDosQueTemQueDiminuirCiclo.push(memoria[i]);
-                                        }
-                                    }
-                                }
-                            }
-
-                            arrayDosQueTemQueDiminuirCiclo.forEach(element => {
-                                element.qtCiclos--;
-
-                                if (element.qtCiclos == 0) {
-                                    done.push(element);
-                                }
-                            });
-
-                            for (var i = 0; i < memoria.length; i++) {
-                                if (memoria[i] == null) {
-                                    //achei a primeira posição vazia...
-                                    if (posIni == null) {
-                                        posIni = i;
-                                    }
-                                }
-                            }
-
-                            for (var i = 0; i < memoria.length; i++) {
-                                if ((memoria[i] != null) && (i > posIni)) {
-                                    //achei a proxima posicao que esta ocupada
-                                    if (posFim == null) {
-                                        posFim = i - 1;
-                                    }
-                                }
-                            }
-
-                            //se não achou nenhum espaço ocupado, significa que toda memoria está livre...
-                            if (posFim == null) {
-                                posFim = memoria.length - 1;
-                            }
-
-                            //pegar primeiro processo da fila creation
                             if (creation[0] != null) {
-
-                                var processo = creation.shift();
-
-                                if (processo != null) {
-                                    //console.log('processo tamanho: ', processo.tamanho);
-                                    if ((posFim - posIni) >= processo.tamanho) {
-                                        //processo cabe na memoria
-                                        var posFimProcesso = posIni + processo.tamanho;
-                                        for (let j = posIni; j < posFimProcesso; j++) {
-                                            memoria[j] = processo;
+                                blocos.every(function (bloco, index) {
+                                    if (bloco.espacoLivre >= creation[0].tamanho) {
+                                        let posFimProcesso = bloco.posIni + creation[0].tamanho;
+                                        for (let index = bloco.posIni; index < posFimProcesso; index++) {
+                                            memory[index] = creation[0];
+                                        }
+                                        creation.shift();
+                                    } else {
+                                        if (index == blocos.length - 1) {
+                                            processo = creation.shift();
+                                            creation.push(processo);
+                                            return false;
+                                        } else {
+                                            return true;
                                         }
                                     }
-                                }
+                                })
                             }
 
-                            //console.log('posIni: ', posIni);
-                            //console.log('posFim: ', posFim);
-                            //console.log(memoria);
-                            //console.log('first-fit end');
-                            atualizarTela();
-                            //throw 'end';
+                            atualizarTela(memory);
                             break;
                         case '2':
                             //circular-fit
 
+                            var blocos = memoryBlocks(memory);
+
+                            if (creation[0] != null) {
+                                blocos.every(function (bloco, index) {
+                                    if (bloco.espacoLivre >= creation[0].tamanho) {
+                                        let posFimProcesso = bloco.posIni + creation[0].tamanho;
+                                        for (let index = bloco.posIni; index < posFimProcesso; index++) {
+                                            memory[index] = creation[0];
+                                        }
+                                        creation.shift();
+                                    } else {
+                                        if (index == blocos.length - 1) {
+                                            processo = creation.shift();
+                                            creation.push(processo);
+                                            return false;
+                                        } else {
+                                            return true;
+                                        }
+                                    }
+                                })
+                            }
+
+                            atualizarTela(memory);
                             break;
                         case '3':
                             //best-fit
 
-                            //primeiro mapear memória
                             var blocos = memoryBlocks(memory);
 
                             blocos = blocos.sort((a, b) => a.espacoLivre - b.espacoLivre); //ordenar por espaco livre
 
-                            console.log('blocos', blocos);
-                            
                             if (creation[0] != null) {
                                 blocos.every(function (bloco, index) {
                                     if (bloco.espacoLivre >= creation[0].tamanho) {
@@ -544,18 +496,10 @@
                                     }
                                 })
                             }
-                            
-                            console.log(memory);
-
-                            atualizarTela(memory);
-
-                            //throw 'S';
-
                             break;
                         case '4':
                             //worst-fit
 
-                            //primeiro mapear memória
                             var blocos = memoryBlocks(memory);
 
                             blocos = blocos.sort((a, b) => b.espacoLivre - a.espacoLivre); //ordenar por espaco livre
@@ -582,15 +526,10 @@
                                     }
                                 }
                             })
-
-                            console.log(memory);
-
-                            atualizarTela(memory);
-
-                            //throw 'S';
-
                             break;
                     }
+
+                    atualizarTela(memory);
 
                     executar = true;
 
@@ -603,12 +542,6 @@
                     } else {
                         alert('Fim!');
                     }
-
-                    //console.log('done: ', done.length);
-                    //console.log('creation: ', creation.length);
-                    //console.log('todos: ', todosProcessos.length);
-                    //console.log('qt process: ', qtProcessos);
-
                 }, tempoEspera)
             }
 
