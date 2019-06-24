@@ -39,6 +39,12 @@
             flex-wrap: wrap;
         }
 
+        #memoria-legenda {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+        }
+
         .text-top {
             text-align: center;
         }
@@ -186,9 +192,16 @@
             </div>
         </div>
     </div>
-
     <div id="full">
         <div id="memoria-dom">
+            <!-- javascript controla aqui dentro -->
+        </div>
+        <br>
+        <div>
+            <button onclick="compactarMemoria();">Compactar memória</button>
+        </div>
+        <br>
+        <div id="memoria-legenda">
             <!-- javascript controla aqui dentro -->
         </div>
     </div>
@@ -216,6 +229,16 @@
             } else {
                 $('#exampleModal').modal('hide');
                 program(qtProcessos, tempoEspera, algoritmo);
+            }
+        }
+
+        function compactarMemoria() {
+            memory = memory.filter(function (el) {
+                return el != null;
+            });
+
+            for (let index = memory.length; index < 5001; index++) {
+                memory[index] = null;
             }
         }
 
@@ -277,10 +300,15 @@
 
             function atualizarTela(memoria) {
 
+                elementoUnico = new Array();
+
                 while (document.getElementById("memoria-dom").firstChild) {
                     document.getElementById("memoria-dom").removeChild(document.getElementById("memoria-dom").firstChild);
                 }
 
+                while (document.getElementById("memoria-legenda").firstChild) {
+                    document.getElementById("memoria-legenda").removeChild(document.getElementById("memoria-legenda").firstChild);
+                }
 
                 for (var i = 0; i < memoria.length; i++) {
                     //bloco de cor
@@ -298,7 +326,36 @@
                         node.style.backgroundColor = '#FFFFFF';
                     }
 
+                    if (!elementoUnico.includes(memoria[i])) {
+                        elementoUnico.push(memoria[i]);
+                    }
+
                     document.getElementById("memoria-dom").appendChild(node);
+                }
+
+                for (let index = 0; index < elementoUnico.length; index++) {
+
+                    const element = elementoUnico[index];
+                    if (element != null) {
+
+                        var div = document.createElement("div");
+                        var node = document.createElement("div");
+                        var textnode = document.createTextNode(element.nome);
+
+                        div.style.margin = '10px';
+
+                        node.style.width = '10px';
+                        node.style.height = '10px';
+                        node.style.border = '1px solid black';
+                        node.style.padding = '1px';
+                        node.style.margin = '1px';
+                        node.style.backgroundColor = element.cor;
+
+                        div.appendChild(textnode);
+                        div.appendChild(node);
+
+                        document.getElementById("memoria-legenda").appendChild(div);
+                    }
                 }
             }
 
@@ -357,14 +414,6 @@
                 }
 
                 return blocos;
-            }
-
-            function compactarMemoria(memoria) {
-                var memoriaCompactada = memoria.filter(function (el) {
-                    return el != null;
-                });
-
-                return memoriaCompactada;
             }
 
             function main() {
