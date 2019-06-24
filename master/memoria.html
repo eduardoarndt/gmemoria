@@ -524,8 +524,6 @@
                             if (creation[0] != null) {
                                 blocos.every(function (bloco, index) {
                                     if (bloco.espacoLivre >= creation[0].tamanho) {
-                                        console.log('bloco', bloco);
-                                        console.log('index', index);
                                         let posFimProcesso = bloco.posIni + creation[0].tamanho;
                                         for (let index = bloco.posIni; index < posFimProcesso; index++) {
                                             memory[index] = creation[0];
@@ -555,8 +553,6 @@
 
                             blocos.every(function (bloco, index) {
                                 if (bloco.espacoLivre >= creation[0].tamanho) {
-                                    console.log('bloco', bloco);
-                                    console.log('index', index);
                                     let posFimProcesso = bloco.posIni + creation[0].tamanho;
                                     for (let index = bloco.posIni; index < posFimProcesso; index++) {
                                         memory[index] = creation[0];
